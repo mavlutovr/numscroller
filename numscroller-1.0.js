@@ -49,7 +49,6 @@
 		return this.each(function (i, obj) {
 			$(this).addClass('scrollzip');
 			if ($.isFunction(settings.showFunction)) {
-				console.log('zipPoint', zipPoint);
 				if (
 					!$(this).hasClass('isShown') &&
 					(
@@ -80,18 +79,21 @@
 
 	function numberRoller(slno) {
 		var min = $('.roller-title-number-' + slno).attr('data-min');
-		var max = $('.roller-title-number-' + slno).attr('data-max');
+		var max = Number($('.roller-title-number-' + slno).attr('data-max').replace(' ', ''));
 		var timediff = $('.roller-title-number-' + slno).attr('data-delay');
 		var increment = $('.roller-title-number-' + slno).attr('data-increment');
 		var delimiter = $('.roller-title-number-' + slno).attr('data-delimiter');
 
+		var frames = Number(timediff) * 1000 / 30;
+
 		if (!increment) {
-			var frames = Number(timediff) * 1000 / 30;
 			increment = max / frames;
 		}
 
 		var numdiff = max - min;
-		var timeout = (timediff * 1000) / numdiff;
+
+		var timeout = timediff / frames;
+		//var timeout = (timediff * 1000) / numdiff;
 		//if(numinc<10){
 		//increment=Math.floor((timediff*1000)/10);
 		//}//alert(increment);
@@ -100,21 +102,32 @@
 	}
 
 	var delimite = function (number, delimiter) {
+
+		number = Math.round(number);
+
 		if (typeof delimiter === 'string') {
 			return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, delimiter);
 		}
 		return number;
 	};
 
-	function numberRoll(slno, min, max, increment, delimiter, timeout) {//alert(slno+"="+min+"="+max+"="+increment+"="+timeout);
+	function numberRoll(slno, min, max, increment, delimiter, timeout) {
+
 		if (min <= max) {
 
 			var delimited = delimite(min, delimiter);
 
 			$('.roller-title-number-' + slno).html(delimited);
-			min = parseInt(min) + parseInt(increment);
+			min = Number(min) + Number(increment);
 			setTimeout(function () {
-				numberRoll(eval(slno), eval(min), eval(max), eval(increment), delimiter, eval(timeout))
+				numberRoll(
+					eval(slno),
+					eval(min),
+					eval(max),
+					eval(increment),
+					delimiter,
+					eval(timeout)
+				)
 			}, timeout);
 		} else {
 			var delimited = delimite(max, delimiter);
